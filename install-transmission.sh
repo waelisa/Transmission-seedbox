@@ -6,7 +6,7 @@
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
-# Ver 2.92
+# Transmission Ver 2.92
 #############################################################################################################################
 apt-get -y install sudo
 #
@@ -22,7 +22,7 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 
 ##  download, compile and install Transmission
 cd ~
-sudo rm -rf transmission-$Trans; rm -f transmission-2.92.tar.xz
+sudo rm -rf transmission-2.92 ; rm -f transmission-2.92.tar.xz
 wget https://transmission.cachefly.net/transmission-2.92.tar.xz
 xz -c -d transmission-2.92.tar.xz | tar -x
 cd transmission-2.92
