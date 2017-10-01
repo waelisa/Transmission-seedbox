@@ -6,7 +6,7 @@
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
-$TransmissioN=2.92
+$Trans=2.92
 #############################################################################################################################
 apt-get -y install sudo
 #
@@ -22,14 +22,14 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 
 ##  download, compile and install Transmission
 cd ~
-sudo rm -rf transmission-$TransmissioN; rm -f transmission-$TransmissioN.tar.xz
-wget https://transmission.cachefly.net/transmission-$TransmissioN.tar.xz
-xz -c -d transmission-$TransmissioN.tar.xz | tar -x
-cd transmission-$TransmissioN
+sudo rm -rf transmission-$Trans; rm -f transmission-$Trans.tar.xz
+wget https://transmission.cachefly.net/transmission-$Trans.tar.xz
+xz -c -d transmission-$Trans.tar.xz | tar -x
+cd transmission-$Trans
 ./configure; make
 sudo checkinstall -y
 cd ..
-sudo rm -r transmission-$TransmissioN; rm transmission-$TransmissioN.tar.xz
+sudo rm -r transmission-$Trans; rm transmission-$Trans.tar.xz
 
 ##  add user transmission
 if [ ! $(grep '^transmission:' /etc/passwd) ]; then
