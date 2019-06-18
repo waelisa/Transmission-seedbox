@@ -6,12 +6,12 @@
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
-# Transmission Ver 2.92
+# Transmission Ver 2.94
 #############################################################################################################################
 apt-get -y install sudo
 #
 set -e
-SCRIPT="$(readlink -e ""$0"")"
+SCRIPT="$(readlink -e """")"
 
 ##  install dependencies and required compiling tools from standard repos
 sudo apt-get update
@@ -22,14 +22,14 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 
 ##  download, compile and install Transmission
 cd ~
-sudo rm -rf transmission-2.92 ; rm -f transmission-2.92.tar.xz
-wget https://transmission.cachefly.net/transmission-2.92.tar.xz
-xz -c -d transmission-2.92.tar.xz | tar -x
-cd transmission-2.92
+sudo rm -rf transmission-2.94 ; rm -f transmission-2.94.tar.xz
+wget https://transmission.cachefly.net/transmission-2.94.tar.xz
+xz -c -d transmission-2.94.tar.xz | tar -x
+cd transmission-2.94
 ./configure; make
 sudo checkinstall -y
 cd ..
-sudo rm -r transmission-2.92; rm transmission-2.92.tar.xz
+sudo rm -r transmission-2.94; rm transmission-2.94.tar.xz
 
 ##  add user transmission
 if [ ! $(grep '^transmission:' /etc/passwd) ]; then
@@ -171,7 +171,7 @@ do_stop()
         return "$RETVAL"
 }
 
-case "$1" in
+case "" in
   start)
         echo "Starting $DESC" "$NAME..."
         do_start
