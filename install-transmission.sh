@@ -2,16 +2,14 @@
 #############################################################################################################################
 # The MIT License (MIT)
 # Wael Isa
-# 1/10/2017
+# 24/6/2019
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
 # Transmission Ver 2.94
 #############################################################################################################################
-apt-get -y install sudo
-#
 set -e
-SCRIPT="$(readlink -e """")"
+SCRIPT="$(readlink -e ""$0"")"
 
 ##  install dependencies and required compiling tools from standard repos
 sudo apt-get update
@@ -20,10 +18,10 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 #-uncomment if needed:
 #sudo apt-get -y install natpmp-utils
 
-##  download, compile and install Transmission
+##  download, compile and install Transmission 2.94
 cd ~
-sudo rm -rf transmission-2.94 ; rm -f transmission-2.94.tar.xz
-wget https://transmission.cachefly.net/transmission-2.94.tar.xz
+sudo rm -rf transmission-2.94; rm -f transmission-2.94.tar.xz
+wget https://github.com/transmission/transmission-releases/raw/master/transmission-2.94.tar.xz
 xz -c -d transmission-2.94.tar.xz | tar -x
 cd transmission-2.94
 ./configure; make
@@ -48,7 +46,7 @@ echo $'\n'$'\n'"Settings: /home/transmission/.config/transmission-daemon/setting
 exit
 
 
-#initdscript#  (from `https://trac.transmissionbt.com/wiki/Scripts/initd` 2017.10.1)
+#initdscript#  (from `https://trac.transmissionbt.com/wiki/Scripts/initd` 2015.03.31)
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          transmission-daemon
@@ -171,7 +169,7 @@ do_stop()
         return "$RETVAL"
 }
 
-case "" in
+case "$1" in
   start)
         echo "Starting $DESC" "$NAME..."
         do_start
