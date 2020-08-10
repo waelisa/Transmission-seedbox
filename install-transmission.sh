@@ -6,7 +6,7 @@
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
-# Transmission Ver 2.94
+# Transmission Ver 3.00
 #############################################################################################################################
 set -e
 SCRIPT="$(readlink -e ""$0"")"
@@ -18,16 +18,16 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 #-uncomment if needed:
 #sudo apt-get -y install natpmp-utils
 
-##  download, compile and install Transmission 2.94
+##  download, compile and install Transmission 3.00
 cd ~
-sudo rm -rf transmission-2.94; rm -f transmission-2.94.tar.xz
-wget https://github.com/transmission/transmission-releases/raw/master/transmission-2.94.tar.xz
+sudo rm -rf transmission-3.00; rm -f transmission-3.00.tar.xz
+wget https://github.com/transmission/transmission-releases/raw/master/transmission-3.00.tar.xz
 xz -c -d transmission-2.94.tar.xz | tar -x
-cd transmission-2.94
+cd transmission-3.00
 ./configure; make
 sudo checkinstall -y
 cd ..
-sudo rm -r transmission-2.94; rm transmission-2.94.tar.xz
+sudo rm -r transmission-3.00; rm transmission-3.00.tar.xz
 
 ##  add user transmission
 if [ ! $(grep '^transmission:' /etc/passwd) ]; then
