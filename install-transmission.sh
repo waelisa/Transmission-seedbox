@@ -22,7 +22,7 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 cd ~
 sudo rm -rf transmission-3.00; rm -f transmission-3.00.tar.xz
 wget https://github.com/transmission/transmission-releases/raw/master/transmission-3.00.tar.xz
-xz -c -d transmission-2.94.tar.xz | tar -x
+xz -c -d transmission-3.00.tar.xz | tar -x
 cd transmission-3.00
 ./configure; make
 sudo checkinstall -y
