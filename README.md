@@ -12,3 +12,5 @@ Now you can use your server ip http://SERVER-IP-OR-HOSTNAME:9091/transmission/we
 Download Transmission Remote GUI https://sourceforge.net/projects/transgui/
 
 [Donate link – PayPal](https://www.paypal.me/WaelIsa)
+
+Note: If you don't have zlib try sudo apt install zlib1g or sudo apt install zlib1g-dev
