@@ -2,11 +2,11 @@
 #############################################################################################################################
 # The MIT License (MIT)
 # Wael Isa
-# 24/6/2019
+# 12/12/2023
 # https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
-# Transmission Ver 3.00
+# Transmission Ver 4.0.4
 #############################################################################################################################
 set -e
 SCRIPT="$(readlink -e ""$0"")"
@@ -18,16 +18,16 @@ sudo sed -i 's/TRANSLATE=1/TRANSLATE=0/' /etc/checkinstallrc
 #-uncomment if needed:
 #sudo apt-get -y install natpmp-utils
 
-##  download, compile and install Transmission 3.00
+##  download, compile and install Transmission 4.0.4
 cd ~
-sudo rm -rf transmission-3.00; rm -f transmission-3.00.tar.xz
-wget https://github.com/transmission/transmission-releases/raw/master/transmission-3.00.tar.xz
-xz -c -d transmission-3.00.tar.xz | tar -x
-cd transmission-3.00
+sudo rm -rf transmission-4.0.4; rm -f transmission-4.0.4.tar.xz
+wget https://github.com/transmission/transmission-releases/raw/master/transmission-4.0.4.tar.xz
+xz -c -d transmission-4.0.4.tar.xz | tar -x
+cd transmission-4.0.4
 ./configure; make
 sudo checkinstall -y
 cd ..
-sudo rm -r transmission-3.00; rm transmission-3.00.tar.xz
+sudo rm -r transmission-4.0.4; rm transmission-4.0.4.tar.xz
 
 ##  add user transmission
 if [ ! $(grep '^transmission:' /etc/passwd) ]; then
