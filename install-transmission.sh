@@ -3,7 +3,6 @@
 # The MIT License (MIT)
 # Wael Isa
 # 12/12/2023
-# https://www.wael.name/linux/install-script-for-transmission-seedbox/
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
 # Transmission Ver 4.0.4
