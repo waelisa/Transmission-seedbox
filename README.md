@@ -30,7 +30,15 @@ The script features an interactive menu for ease of use, but also supports CLI f
 
 Bash
 
-# Interactive Menu sudo ./transmission-manager.sh # Automation Flags sudo ./transmission-manager.sh -i # Install latest version silently sudo ./transmission-manager.sh -u # Check for and apply updates sudo ./transmission-manager.sh -p # Set a custom RPC password
+# Interactive Menu 
+sudo ./transmission-manager.sh 
+# Automation Flags
+# Install latest version silently 
+sudo ./transmission-manager.sh -i 
+# Check for and apply updates 
+sudo ./transmission-manager.sh -u 
+# Set a custom RPC password
+sudo ./transmission-manager.sh -p 
 
 ## **📊 Technical Optimizations**
 
