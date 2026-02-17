@@ -3,13 +3,17 @@
 ## **📦 Installation Methods**
 
 **Download the script:**
-    ```bash
+
+   bash
+    
     wget https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh
-    ```
-    or
-    ```bash
+    
+        or
+ 
+bash
+    
     curl -O https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh
-    ```
+    
 bash
 
 ### **Method 1: Interactive Menu (Recommended)**
