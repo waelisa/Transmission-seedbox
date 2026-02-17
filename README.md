@@ -8,7 +8,7 @@
     
     wget https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh
     
-        or
+ or
  
 bash
     
