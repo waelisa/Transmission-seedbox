@@ -1,16 +1,14 @@
-# Transmission-seedbox
-
 # Transmission Seedbox Manager[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)[![Shell Script](https://img.shields.io/badge/Shell-Bash-blue.svg)](https://www.gnu.org/software/bash/)[![Transmission](https://img.shields.io/badge/Transmission-4.1.0+-orange.svg)](https://transmissionbt.com/)
 
 ## **📦 Installation Methods**
 
 **Download the script:**
     ```bash
-    wget https://github.com/waelisa/WAYDROID-MANAGER/raw/refs/heads/main/waydroid-manager.sh
+    wget https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh
     ```
     or
     ```bash
-    curl -O https://github.com/waelisa/WAYDROID-MANAGER/raw/refs/heads/main/waydroid-manager.sh
+    curl -O https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh
     ```
 bash
 
