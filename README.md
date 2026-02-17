@@ -51,4 +51,4 @@ This manager doesn't just install software; it prepares your Linux kernel for he
 
 If this script saved you time or improved your seedbox performance, consider supporting the developer:
 
-*   **PayPal:** [Donate via PayPal](file:///opt/onlyoffice/desktopeditors/editors/web-apps/apps/documenteditor/main/index.html?_dc=0&lang=en-US&type=desktop&frameEditorId=placeholder&isForm=false&parentOrigin=file://&fileType=docx)
+*   **PayPal:** [Donate link – PayPal](https://www.paypal.me/WaelIsa)
