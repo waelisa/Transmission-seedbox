@@ -3,7 +3,7 @@
 #
 # Wael Isa
 # Website:  https://www.wael.name
-# Version: 5.0.7
+# Version: 5.0.8
 # https://github.com/waelisa/Transmission-seedbox
 # Build Date: 04/03/2026
 # License: MIT
@@ -69,7 +69,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="04/03/2026"
-SCRIPT_VERSION="5.0.7"
+SCRIPT_VERSION="5.0.8"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -728,6 +728,8 @@ install_transmission() {
 
     # Build
     if [ -f "CMakeLists.txt" ]; then
+        # Clean build directory to avoid cache issues
+        rm -rf build
         mkdir -p build && cd build
         # Core performance libraries (widely available) forced ON
         # Protocol libraries use AUTO for maximum compatibility
