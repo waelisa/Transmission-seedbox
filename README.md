@@ -1,6 +1,9 @@
 # **Transmission Seedbox Manager (Gold Master Edition)**
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)[![Shell Script](https://img.shields.io/badge/Shell-Bash-blue.svg)](https://www.gnu.org/software/bash/)[![Transmission](https://img.shields.io/badge/Transmission-4.1.0+-orange.svg)](https://transmissionbt.com/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Shell Script](https://img.shields.io/badge/Shell-Bash-blue.svg)](https://www.gnu.org/software/bash/)
+[![Transmission](https://img.shields.io/badge/Transmission-4.1.0+-orange.svg)](https://transmissionbt.com/) 
+[![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)](#)
 
 An industrial-grade, automated management tool for Transmission 4.0+. This script is designed for high-performance seedbox environments, featuring automatic dependency resolution, kernel-level network tuning, and support for multiple init systems.
 
@@ -8,9 +11,9 @@ An industrial-grade, automated management tool for Transmission 4.0+. This scrip
 
 Run the manager immediately with this one-liner:
 
-Bash
-
+```bash
 wget -qO transmission-manager.sh https://github.com/waelisa/Transmission-seedbox/raw/refs/heads/master/transmission-manager.sh && chmod +x transmission-manager.sh && sudo ./transmission-manager.sh
+```
 
 ## **✨ Key Features**
 
@@ -28,18 +31,23 @@ wget -qO transmission-manager.sh https://github.com/waelisa/Transmission-seedbox
 
 The script features an interactive menu for ease of use, but also supports CLI flags for automation:
 
-Bash
-
 # Interactive Menu 
-sudo ./transmission-manager.sh 
+```bash
+sudo ./transmission-manager.sh
+```
 # Automation Flags
 # Install latest version silently 
-sudo ./transmission-manager.sh -i 
+```bash
+sudo ./transmission-manager.sh -i
+```
 # Check for and apply updates 
-sudo ./transmission-manager.sh -u 
+```bash
+sudo ./transmission-manager.sh -u
+```
 # Set a custom RPC password
+```bash
 sudo ./transmission-manager.sh -p 
-
+```
 ## **📊 Technical Optimizations**
 
 This manager doesn't just install software; it prepares your Linux kernel for heavy torrenting:
