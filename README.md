@@ -3,7 +3,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![Shell Script](https://img.shields.io/badge/Shell-Bash-blue.svg)](https://www.gnu.org/software/bash/)
 [![Transmission](https://img.shields.io/badge/Transmission-4.1.0+-orange.svg)](https://transmissionbt.com/) 
-[![Version](https://img.shields.io/badge/version-5.0.2-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-5.0.9-blue.svg)](#)
 
 An industrial-grade, automated management tool for Transmission 4.0+. This script is designed for high-performance seedbox environments, featuring automatic dependency resolution, kernel-level network tuning, and support for multiple init systems.
 
