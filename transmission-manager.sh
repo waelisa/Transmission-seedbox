@@ -3,7 +3,7 @@
 #
 # Wael Isa
 # Website:  https://www.wael.name
-# Version: 5.0.8
+# Version: 5.0.9
 # https://github.com/waelisa/Transmission-seedbox
 # Build Date: 04/03/2026
 # License: MIT
@@ -35,7 +35,7 @@
 #   ✓ Disk space check before installation
 #   ✓ EPEL auto-enable for RHEL/CentOS/Rocky/AlmaLinux
 #   ✓ Kernel optimizations for 1Gbps+ traffic
-#   ✓ AUTO strategy for NAT-PMP, UPnP, UTP, DHT (max compatibility)
+#   ✓ AUTO strategy for NAT-PMP, UPnP, UTP, DHT, B64 (max compatibility)
 #   ✓ Core system libraries (event2, deflate) forced ON for performance
 #############################################################################################################################
 
@@ -69,7 +69,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="04/03/2026"
-SCRIPT_VERSION="5.0.8"
+SCRIPT_VERSION="5.0.9"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -522,9 +522,8 @@ install_dependencies() {
             DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
-                libmbedtls-dev libdeflate-dev libnatpmp-dev libminiupnpc-dev \
-                libpsl-dev
-            # Note: libutp-dev and libdht-dev are not in Debian 12 repos; we rely on AUTO fallback
+                libmbedtls-dev libdeflate-dev libpsl-dev
+            # Note: libutp-dev, libdht-dev, libb64-dev are not in Debian 12 repos; we rely on AUTO fallback
             ;;
 
         rhel)
@@ -546,15 +545,13 @@ install_dependencies() {
             sudo $pkg_manager -y -q install \
                 checkinstall libtool intltool libcurl-devel openssl-devel \
                 libevent-devel wget curl cmake jq mbedtls-devel \
-                libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel libutp-devel libdht-devel || true   # Optional
+                libdeflate-devel libpsl-devel libutp-devel libdht-devel libb64-devel || true   # Optional
             ;;
 
         arch)
             print_message "$YELLOW" "📦 Using pacman package manager..."
             sudo pacman -Sy --noconfirm --quiet base-devel checkinstall libtool intltool curl openssl \
-                libevent wget cmake jq mbedtls libdeflate libnatpmp miniupnpc \
-                libpsl libutp dht || true   # Optional
+                libevent wget cmake jq mbedtls libdeflate libpsl libutp dht libb64 || true   # Optional
             ;;
 
         suse)
@@ -562,16 +559,14 @@ install_dependencies() {
             sudo zypper --non-interactive --quiet install -t pattern devel_basis
             sudo zypper --non-interactive --quiet install checkinstall libtool intltool libcurl-devel \
                 libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel \
-                libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel libutp-devel libdht-devel || true   # Optional
+                libdeflate-devel libpsl-devel libutp-devel libdht-devel libb64-devel || true   # Optional
             ;;
 
         alpine)
             print_message "$YELLOW" "📦 Using apk package manager..."
             sudo apk add --quiet build-base checkinstall libtool intltool curl-dev openssl-dev \
                 libevent-dev linux-headers wget curl cmake jq mbedtls-dev \
-                libdeflate-dev libnatpmp-dev miniupnpc-dev \
-                libpsl-dev libutp-dev libdht-dev || true   # Optional
+                libdeflate-dev libpsl-dev libutp-dev libdht-dev libb64-dev || true   # Optional
             ;;
 
         *)
@@ -732,7 +727,7 @@ install_transmission() {
         rm -rf build
         mkdir -p build && cd build
         # Core performance libraries (widely available) forced ON
-        # Protocol libraries use AUTO for maximum compatibility
+        # All optional libraries use AUTO for maximum compatibility
         cmake -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX=/usr/local \
               -DENABLE_DAEMON=ON \
@@ -750,7 +745,8 @@ install_transmission() {
               -DUSE_SYSTEM_NATPMP=AUTO \
               -DUSE_SYSTEM_UTP=AUTO \
               -DUSE_SYSTEM_DHT=AUTO \
-              -DUSE_SYSTEM_B64=ON \
+              -DUSE_SYSTEM_B64=AUTO \
+              -DUSE_SYSTEM_B64=AUTO \
               -DENABLE_TESTS=OFF \
               -DINSTALL_LIB=OFF \
               -DINSTALL_DOC=OFF \
