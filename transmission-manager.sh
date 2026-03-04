@@ -1,10 +1,20 @@
 #!/bin/bash
 #############################################################################################################################
-# The MIT License (MIT)
+#
 # Wael Isa
-# Build Date: 02/18/2026
-# Version: 5.0.2
+# Website:  https://www.wael.name
+# Version: 5.0.3
 # https://github.com/waelisa/Transmission-seedbox
+# Build Date: 04/03/2026
+# License: MIT
+#
+# ██╗    ██╗ █████╗ ███████╗██╗         ██╗███████╗ █████╗
+# ██║    ██║██╔══██╗██╔════╝██║         ██║██╔════╝██╔══██╗
+# ██║ █╗ ██║███████║█████╗  ██║         ██║███████╗███████║
+# ██║███╗██║██╔══██║██╔══╝  ██║         ██║╚════██║██╔══██║
+# ╚███╔███╔╝██║  ██║███████╗███████╗    ██║███████╗██║  ██║
+# ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝╚══════╝    ╚═╝╚══════╝╚═╝  ╚═╝
+#
 #############################################################################################################################
 # Transmission Auto Installer/Uninstaller - GOLD MASTER EDITION
 # Automatically detects and installs latest Transmission version
@@ -24,6 +34,8 @@
 #   ✓ Secure log permissions (640)
 #   ✓ Disk space check before installation
 #   ✓ EPEL auto-enable for RHEL/CentOS/Rocky/AlmaLinux
+#   ✓ Kernel optimizations for 1Gbps+ traffic
+#   ✓ NAT-PMP & UPnP support (libnatpmp, miniupnpc)
 #############################################################################################################################
 
 # Strict mode - exit on error, undefined variables, pipe failures
@@ -56,7 +68,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="02/18/2026"
-SCRIPT_VERSION="5.0.2"
+SCRIPT_VERSION="5.0.3"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -271,6 +283,47 @@ EOF
     print_message "$YELLOW" "  - Max open files: 100000"
 }
 
+# Function to apply kernel optimizations for 1Gbps+ traffic
+apply_kernel_optimizations() {
+    log_step "7/16" "Applying high-performance kernel tweaks..."
+
+    local sysctl_conf="/etc/sysctl.d/99-transmission-kernel.conf"
+
+    # Check if already applied
+    if [ -f "$sysctl_conf" ]; then
+        print_message "$YELLOW" "  Kernel optimizations already configured"
+        return 0
+    fi
+
+    sudo tee "$sysctl_conf" >/dev/null <<EOF
+# Transmission Kernel Optimizations
+# Applied on: $(date)
+
+# Increase max open files (already set, but ensure consistency)
+fs.file-max = 1000000
+
+# Expand local port range for many outgoing connections
+net.ipv4.ip_local_port_range = 1024 65535
+
+# Increase max number of remembered connection requests
+net.ipv4.tcp_max_syn_backlog = 4096
+net.core.somaxconn = 4096
+
+# Enable TCP Fast Open (supported by Transmission 4.x)
+net.ipv4.tcp_fastopen = 3
+EOF
+
+    # Apply settings
+    if sudo sysctl -p "$sysctl_conf" >/dev/null 2>&1; then
+        print_message "$GREEN" "✓ Kernel optimizations applied"
+    else
+        print_message "$YELLOW" "⚠ Some kernel settings require reboot to take effect"
+    fi
+
+    print_message "$YELLOW" "  - Port range: 1024-65535"
+    print_message "$YELLOW" "  - TCP Fast Open: enabled"
+}
+
 # Function to setup log rotation
 setup_logrotate() {
     log_step "4/16" "Setting up log rotation..."
@@ -468,12 +521,12 @@ install_dependencies() {
             DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
-                libmbedtls-dev libdeflate-dev
+                libmbedtls-dev libdeflate-dev libnatpmp-dev libminiupnpc-dev
             ;;
 
         rhel)
             print_message "$YELLOW" "📦 Configuring RHEL-family package manager..."
-            # Install EPEL if missing, as it contains libdeflate and libevent-devel
+            # Install EPEL if missing, as it contains libdeflate, libevent-devel, and miniupnpc-devel
             if ! rpm -q epel-release >/dev/null 2>&1; then
                 print_message "$CYAN" "  Adding EPEL repository..."
                 if command -v dnf >/dev/null 2>&1; then
@@ -489,26 +542,29 @@ install_dependencies() {
             sudo $pkg_manager -y -q groupinstall "Development Tools"
             sudo $pkg_manager -y -q install \
                 checkinstall libtool intltool libcurl-devel openssl-devel \
-                libevent-devel wget curl cmake jq mbedtls-devel libdeflate-devel
+                libevent-devel wget curl cmake jq mbedtls-devel \
+                libdeflate-devel libnatpmp-devel miniupnpc-devel
             ;;
 
         arch)
             print_message "$YELLOW" "📦 Using pacman package manager..."
             sudo pacman -Sy --noconfirm --quiet base-devel checkinstall libtool intltool curl openssl \
-                libevent wget cmake jq mbedtls libdeflate
+                libevent wget cmake jq mbedtls libdeflate libnatpmp miniupnpc
             ;;
 
         suse)
             print_message "$YELLOW" "📦 Using zypper package manager..."
             sudo zypper --non-interactive --quiet install -t pattern devel_basis
             sudo zypper --non-interactive --quiet install checkinstall libtool intltool libcurl-devel \
-                libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel libdeflate-devel
+                libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel \
+                libdeflate-devel libnatpmp-devel miniupnpc-devel
             ;;
 
         alpine)
             print_message "$YELLOW" "📦 Using apk package manager..."
             sudo apk add --quiet build-base checkinstall libtool intltool curl-dev openssl-dev \
-                libevent-dev linux-headers wget curl cmake jq mbedtls-dev libdeflate-dev
+                libevent-dev linux-headers wget curl cmake jq mbedtls-dev \
+                libdeflate-dev libnatpmp-dev miniupnpc-dev
             ;;
 
         *)
@@ -674,6 +730,7 @@ install_transmission() {
               -DENABLE_UTILS=ON \
               -DENABLE_CLI=ON \
               -DENABLE_WEB=ON \
+              -DENABLE_UTP=ON \
               -DUSE_SYSTEM_EVENT2=ON \
               -DUSE_SYSTEM_DEFLATE=ON \
               -DUSE_SYSTEM_MBEDTLS=ON \
@@ -683,10 +740,18 @@ install_transmission() {
               -DUSE_SYSTEM_NATPMP=ON \
               -DUSE_SYSTEM_UTP=ON \
               -DUSE_SYSTEM_B64=ON \
+              -DENABLE_TESTS=OFF \
+              -DINSTALL_LIB=OFF \
+              -DINSTALL_DOC=OFF \
               ..
         local jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
         make -j${jobs}
         sudo make install
+        # Strip binary to reduce memory footprint
+        if command -v transmission-daemon >/dev/null 2>&1; then
+            sudo strip "$(command -v transmission-daemon)" 2>/dev/null || true
+            print_message "$GREEN" "✓ Binary stripped"
+        fi
     elif [ -f "configure" ]; then
         ./configure --prefix=/usr/local \
                     --disable-gtk \
@@ -946,6 +1011,9 @@ do_install() {
     fi
 
     install_dependencies
+
+    # Apply kernel optimizations (new step 7)
+    apply_kernel_optimizations
 
     log_step "12/16" "Detecting latest Transmission version..."
     LATEST_VERSION=$(get_latest_version)
@@ -1304,10 +1372,11 @@ show_menu() {
     echo "12) View Logs"
     echo "13) Show Performance"
     echo "14) Apply Network Optimizations"
-    echo "15) View Install Logs"
-    echo "16) Exit"
+    echo "15) Apply Kernel Optimizations"
+    echo "16) View Install Logs"
+    echo "17) Exit"
     echo ""
-    read -p "Select [1-16]: " menu_choice
+    read -p "Select [1-17]: " menu_choice
 }
 
 # Show performance stats
@@ -1364,6 +1433,7 @@ main() {
         status) show_status; exit 0 ;;
         backup) backup_config; exit 0 ;;
         optimize) apply_network_optimizations; exit 0 ;;
+        kernel) apply_kernel_optimizations; exit 0 ;;
     esac
 
     while true; do
@@ -1389,8 +1459,9 @@ main() {
             12) view_logs ;;
             13) show_performance ;;
             14) apply_network_optimizations ;;
-            15) view_install_logs ;;
-            16) echo "Goodbye!"; exit 0 ;;
+            15) apply_kernel_optimizations ;;
+            16) view_install_logs ;;
+            17) echo "Goodbye!"; exit 0 ;;
             *) echo "Invalid option" ;;
         esac
         read -p "Press Enter to continue..."
