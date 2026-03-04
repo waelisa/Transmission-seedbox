@@ -3,7 +3,7 @@
 #
 # Wael Isa
 # Website:  https://www.wael.name
-# Version: 5.0.5
+# Version: 5.0.6
 # https://github.com/waelisa/Transmission-seedbox
 # Build Date: 04/03/2026
 # License: MIT
@@ -37,6 +37,7 @@
 #   ✓ Kernel optimizations for 1Gbps+ traffic
 #   ✓ NAT-PMP & UPnP support (libnatpmp, miniupnpc)
 #   ✓ PSL support (libpsl)
+#   ✓ UTP & DHT with AUTO fallback (works on any distro)
 #############################################################################################################################
 
 # Strict mode - exit on error, undefined variables, pipe failures
@@ -69,7 +70,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="04/03/2026"
-SCRIPT_VERSION="5.0.5"
+SCRIPT_VERSION="5.0.6"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -523,12 +524,12 @@ install_dependencies() {
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
                 libmbedtls-dev libdeflate-dev libnatpmp-dev libminiupnpc-dev \
-                libpsl-dev
+                libpsl-dev libutp-dev libdht-dev || true   # Optional: if missing, build still works via AUTO flags
             ;;
 
         rhel)
             print_message "$YELLOW" "📦 Configuring RHEL-family package manager..."
-            # Install EPEL if missing, as it contains many of these packages
+            # Install EPEL if missing
             if ! rpm -q epel-release >/dev/null 2>&1; then
                 print_message "$CYAN" "  Adding EPEL repository..."
                 if command -v dnf >/dev/null 2>&1; then
@@ -546,14 +547,14 @@ install_dependencies() {
                 checkinstall libtool intltool libcurl-devel openssl-devel \
                 libevent-devel wget curl cmake jq mbedtls-devel \
                 libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel
+                libpsl-devel libutp-devel libdht-devel || true   # Optional
             ;;
 
         arch)
             print_message "$YELLOW" "📦 Using pacman package manager..."
             sudo pacman -Sy --noconfirm --quiet base-devel checkinstall libtool intltool curl openssl \
                 libevent wget cmake jq mbedtls libdeflate libnatpmp miniupnpc \
-                libpsl
+                libpsl libutp dht || true   # Optional
             ;;
 
         suse)
@@ -562,7 +563,7 @@ install_dependencies() {
             sudo zypper --non-interactive --quiet install checkinstall libtool intltool libcurl-devel \
                 libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel \
                 libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel
+                libpsl-devel libutp-devel libdht-devel || true   # Optional
             ;;
 
         alpine)
@@ -570,7 +571,7 @@ install_dependencies() {
             sudo apk add --quiet build-base checkinstall libtool intltool curl-dev openssl-dev \
                 libevent-dev linux-headers wget curl cmake jq mbedtls-dev \
                 libdeflate-dev libnatpmp-dev miniupnpc-dev \
-                libpsl-dev
+                libpsl-dev libutp-dev libdht-dev || true   # Optional
             ;;
 
         *)
@@ -743,7 +744,8 @@ install_transmission() {
               -DUSE_SYSTEM_PSL=ON \
               -DUSE_SYSTEM_MINIUPNPC=ON \
               -DUSE_SYSTEM_NATPMP=ON \
-              -DUSE_SYSTEM_UTP=ON \
+              -DUSE_SYSTEM_UTP=AUTO \
+              -DUSE_SYSTEM_DHT=AUTO \
               -DUSE_SYSTEM_B64=ON \
               -DENABLE_TESTS=OFF \
               -DINSTALL_LIB=OFF \
@@ -1017,7 +1019,7 @@ do_install() {
 
     install_dependencies
 
-    # Apply kernel optimizations (new step 7)
+    # Apply kernel optimizations
     apply_kernel_optimizations
 
     log_step "12/16" "Detecting latest Transmission version..."
