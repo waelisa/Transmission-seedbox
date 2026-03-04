@@ -3,7 +3,7 @@
 #
 # Wael Isa
 # Website:  https://www.wael.name
-# Version: 5.0.6
+# Version: 5.0.7
 # https://github.com/waelisa/Transmission-seedbox
 # Build Date: 04/03/2026
 # License: MIT
@@ -35,9 +35,8 @@
 #   ✓ Disk space check before installation
 #   ✓ EPEL auto-enable for RHEL/CentOS/Rocky/AlmaLinux
 #   ✓ Kernel optimizations for 1Gbps+ traffic
-#   ✓ NAT-PMP & UPnP support (libnatpmp, miniupnpc)
-#   ✓ PSL support (libpsl)
-#   ✓ UTP & DHT with AUTO fallback (works on any distro)
+#   ✓ AUTO strategy for NAT-PMP, UPnP, UTP, DHT (max compatibility)
+#   ✓ Core system libraries (event2, deflate) forced ON for performance
 #############################################################################################################################
 
 # Strict mode - exit on error, undefined variables, pipe failures
@@ -70,7 +69,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="04/03/2026"
-SCRIPT_VERSION="5.0.6"
+SCRIPT_VERSION="5.0.7"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -524,7 +523,8 @@ install_dependencies() {
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
                 libmbedtls-dev libdeflate-dev libnatpmp-dev libminiupnpc-dev \
-                libpsl-dev libutp-dev libdht-dev || true   # Optional: if missing, build still works via AUTO flags
+                libpsl-dev
+            # Note: libutp-dev and libdht-dev are not in Debian 12 repos; we rely on AUTO fallback
             ;;
 
         rhel)
@@ -729,6 +729,8 @@ install_transmission() {
     # Build
     if [ -f "CMakeLists.txt" ]; then
         mkdir -p build && cd build
+        # Core performance libraries (widely available) forced ON
+        # Protocol libraries use AUTO for maximum compatibility
         cmake -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_INSTALL_PREFIX=/usr/local \
               -DENABLE_DAEMON=ON \
@@ -742,8 +744,8 @@ install_transmission() {
               -DUSE_SYSTEM_DEFLATE=ON \
               -DUSE_SYSTEM_MBEDTLS=ON \
               -DUSE_SYSTEM_PSL=ON \
-              -DUSE_SYSTEM_MINIUPNPC=ON \
-              -DUSE_SYSTEM_NATPMP=ON \
+              -DUSE_SYSTEM_MINIUPNPC=AUTO \
+              -DUSE_SYSTEM_NATPMP=AUTO \
               -DUSE_SYSTEM_UTP=AUTO \
               -DUSE_SYSTEM_DHT=AUTO \
               -DUSE_SYSTEM_B64=ON \
