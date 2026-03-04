@@ -3,7 +3,7 @@
 # The MIT License (MIT)
 # Wael Isa
 # Build Date: 02/18/2026
-# Version: 5.0.0+ (Auto-detects latest during installation)
+# Version: 5.0.2
 # https://github.com/waelisa/Transmission-seedbox
 #############################################################################################################################
 # Transmission Auto Installer/Uninstaller - GOLD MASTER EDITION
@@ -22,6 +22,8 @@
 #   ✓ Proper error trapping with line numbers
 #   ✓ Industrial-grade reliability
 #   ✓ Secure log permissions (640)
+#   ✓ Disk space check before installation
+#   ✓ EPEL auto-enable for RHEL/CentOS/Rocky/AlmaLinux
 #############################################################################################################################
 
 # Strict mode - exit on error, undefined variables, pipe failures
@@ -54,7 +56,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="02/18/2026"
-SCRIPT_VERSION="5.0.0+"
+SCRIPT_VERSION="5.0.2"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -127,6 +129,28 @@ check_requirements() {
         echo -e "${YELLOW}Please install them and try again${NC}"
         exit 1
     fi
+}
+
+# Function to check disk space (minimum 5GB)
+check_disk_space() {
+    local target_dir="$DOWNLOAD_DIR"
+    local required_gb=5
+    local required_kb=$((required_gb * 1024 * 1024))
+
+    # If the directory doesn't exist, check its parent or root
+    while [ ! -d "$target_dir" ]; do
+        target_dir=$(dirname "$target_dir")
+    done
+
+    local available_kb=$(df "$target_dir" | awk 'NR==2 {print $4}')
+    local available_gb=$((available_kb / 1024 / 1024))
+
+    if [ "$available_kb" -lt "$required_kb" ]; then
+        print_message "$RED" "❌ Insufficient disk space on $target_dir"
+        print_message "$YELLOW" "  Required: ${required_gb}GB | Available: ${available_gb}GB"
+        exit 1
+    fi
+    print_message "$GREEN" "✓ Disk space check passed (${available_gb}GB available on $target_dir)"
 }
 
 # Function to log steps with timestamp
@@ -444,39 +468,47 @@ install_dependencies() {
             DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq \
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
-                libmbedtls-dev
+                libmbedtls-dev libdeflate-dev
             ;;
 
         rhel)
-            print_message "$YELLOW" "📦 Using yum/dnf package manager..."
-            if command -v dnf >/dev/null 2>&1; then
-                sudo dnf -y -q groupinstall "Development Tools"
-                sudo dnf -y -q install checkinstall libtool intltool libcurl-devel openssl-devel \
-                    libevent-devel wget curl cmake jq mbedtls-devel || true
-            else
-                sudo yum -y -q groupinstall "Development Tools"
-                sudo yum -y -q install checkinstall libtool intltool libcurl-devel openssl-devel \
-                    libevent-devel wget curl cmake jq mbedtls-devel || true
+            print_message "$YELLOW" "📦 Configuring RHEL-family package manager..."
+            # Install EPEL if missing, as it contains libdeflate and libevent-devel
+            if ! rpm -q epel-release >/dev/null 2>&1; then
+                print_message "$CYAN" "  Adding EPEL repository..."
+                if command -v dnf >/dev/null 2>&1; then
+                    sudo dnf install -y -q epel-release
+                else
+                    sudo yum install -y -q epel-release
+                fi
             fi
+
+            local pkg_manager="dnf"
+            command -v dnf >/dev/null 2>&1 || pkg_manager="yum"
+
+            sudo $pkg_manager -y -q groupinstall "Development Tools"
+            sudo $pkg_manager -y -q install \
+                checkinstall libtool intltool libcurl-devel openssl-devel \
+                libevent-devel wget curl cmake jq mbedtls-devel libdeflate-devel
             ;;
 
         arch)
             print_message "$YELLOW" "📦 Using pacman package manager..."
             sudo pacman -Sy --noconfirm --quiet base-devel checkinstall libtool intltool curl openssl \
-                libevent wget cmake jq mbedtls
+                libevent wget cmake jq mbedtls libdeflate
             ;;
 
         suse)
             print_message "$YELLOW" "📦 Using zypper package manager..."
             sudo zypper --non-interactive --quiet install -t pattern devel_basis
             sudo zypper --non-interactive --quiet install checkinstall libtool intltool libcurl-devel \
-                libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel
+                libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel libdeflate-devel
             ;;
 
         alpine)
             print_message "$YELLOW" "📦 Using apk package manager..."
             sudo apk add --quiet build-base checkinstall libtool intltool curl-dev openssl-dev \
-                libevent-dev linux-headers wget curl cmake jq mbedtls-dev
+                libevent-dev linux-headers wget curl cmake jq mbedtls-dev libdeflate-dev
             ;;
 
         *)
@@ -901,6 +933,10 @@ do_install() {
     print_message "$GREEN" "======================================================"
     print_message "$GREEN" "  Transmission Seedbox Installation"
     print_message "$GREEN" "======================================================"
+
+    # Disk space check
+    log_step "1/16" "Checking available disk space..."
+    check_disk_space
 
     # Stop if running
     if is_transmission_running; then
