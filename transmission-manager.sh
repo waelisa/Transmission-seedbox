@@ -3,7 +3,7 @@
 #
 # Wael Isa
 # Website:  https://www.wael.name
-# Version: 5.0.4
+# Version: 5.0.5
 # https://github.com/waelisa/Transmission-seedbox
 # Build Date: 04/03/2026
 # License: MIT
@@ -36,7 +36,7 @@
 #   ✓ EPEL auto-enable for RHEL/CentOS/Rocky/AlmaLinux
 #   ✓ Kernel optimizations for 1Gbps+ traffic
 #   ✓ NAT-PMP & UPnP support (libnatpmp, miniupnpc)
-#   ✓ DHT & PSL support (libdht, libpsl)
+#   ✓ PSL support (libpsl)
 #############################################################################################################################
 
 # Strict mode - exit on error, undefined variables, pipe failures
@@ -69,7 +69,7 @@ STEP_LOG="/var/log/transmission-steps.log"
 DOWNLOAD_DIR="/downloads"
 TRANSMISSION_LOG_DIR="/var/log/transmission"
 BUILD_DATE="04/03/2026"
-SCRIPT_VERSION="5.0.4"
+SCRIPT_VERSION="5.0.5"
 INSTALL_MARKER="/etc/transmission-manager.installed"
 
 # Log rotation configuration for installer logs
@@ -523,7 +523,7 @@ install_dependencies() {
                 build-essential checkinstall pkg-config libtool intltool \
                 libcurl4-openssl-dev libssl-dev libevent-dev wget curl cmake jq \
                 libmbedtls-dev libdeflate-dev libnatpmp-dev libminiupnpc-dev \
-                libpsl-dev libdht-dev
+                libpsl-dev
             ;;
 
         rhel)
@@ -546,14 +546,14 @@ install_dependencies() {
                 checkinstall libtool intltool libcurl-devel openssl-devel \
                 libevent-devel wget curl cmake jq mbedtls-devel \
                 libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel dht-devel
+                libpsl-devel
             ;;
 
         arch)
             print_message "$YELLOW" "📦 Using pacman package manager..."
             sudo pacman -Sy --noconfirm --quiet base-devel checkinstall libtool intltool curl openssl \
                 libevent wget cmake jq mbedtls libdeflate libnatpmp miniupnpc \
-                libpsl dht
+                libpsl
             ;;
 
         suse)
@@ -562,7 +562,7 @@ install_dependencies() {
             sudo zypper --non-interactive --quiet install checkinstall libtool intltool libcurl-devel \
                 libopenssl-devel libevent-devel wget curl cmake jq mbedtls-devel \
                 libdeflate-devel libnatpmp-devel miniupnpc-devel \
-                libpsl-devel dht-devel
+                libpsl-devel
             ;;
 
         alpine)
@@ -570,7 +570,7 @@ install_dependencies() {
             sudo apk add --quiet build-base checkinstall libtool intltool curl-dev openssl-dev \
                 libevent-dev linux-headers wget curl cmake jq mbedtls-dev \
                 libdeflate-dev libnatpmp-dev miniupnpc-dev \
-                libpsl-dev dht-dev
+                libpsl-dev
             ;;
 
         *)
@@ -741,7 +741,6 @@ install_transmission() {
               -DUSE_SYSTEM_DEFLATE=ON \
               -DUSE_SYSTEM_MBEDTLS=ON \
               -DUSE_SYSTEM_PSL=ON \
-              -DUSE_SYSTEM_DHT=ON \
               -DUSE_SYSTEM_MINIUPNPC=ON \
               -DUSE_SYSTEM_NATPMP=ON \
               -DUSE_SYSTEM_UTP=ON \
